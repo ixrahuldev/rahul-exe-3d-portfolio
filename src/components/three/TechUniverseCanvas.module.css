@@ -1,0 +1,120 @@
+.canvasWrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  max-height: 840px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.canvasInner {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.ambientGlow {
+  position: absolute;
+  width: 540px;
+  height: 540px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.16) 0%, rgba(19, 201, 244, 0.06) 45%, rgba(250, 246, 238, 0) 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating Module Preview Layer */
+.floatingPillsLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.modulePillWrapper {
+  position: absolute;
+  pointer-events: auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform var(--transition-fast);
+}
+
+.modulePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: var(--bg-surface-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(16, 27, 76, 0.08);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.modulePill:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 22px rgba(16, 27, 76, 0.14);
+  border-color: var(--accent-violet);
+  background: #FFFFFF;
+}
+
+.modulePillActive {
+  border-color: var(--accent-violet);
+  box-shadow: 0 0 0 2px rgba(119, 59, 234, 0.25), 0 8px 24px rgba(16, 27, 76, 0.12);
+  background: #FFFFFF;
+  color: var(--accent-violet);
+}
+
+.pillDot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 4px currentColor;
+}
+
+/* Connector Line to Orbit */
+.connectorLine {
+  width: 1.5px;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--border-subtle), rgba(169, 140, 255, 0.4));
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .canvasWrapper {
+    min-height: 480px;
+    max-height: 600px;
+  }
+  .modulePill {
+    font-size: 11px;
+    padding: 5px 11px;
+  }
+}
+
+@media (max-width: 900px) {
+  .canvasWrapper {
+    min-height: 400px;
+    max-height: 480px;
+  }
+}

@@ -1,0 +1,155 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  max-width: 430px;
+  z-index: 10;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-body);
+}
+
+.heading {
+  font-family: var(--font-sans);
+  font-size: 46px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-heading);
+}
+
+.headingPrefix {
+  color: #8B5CF6;
+}
+
+.futureWord {
+  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.headingPeriod {
+  color: #3B82F6;
+  -webkit-text-fill-color: #3B82F6;
+}
+
+.subheadline {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tagDivider {
+  color: #8B5CF6;
+  font-size: 12px;
+}
+
+.description {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--text-body);
+  max-width: 390px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.exploreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--text-heading);
+  color: #FFFFFF;
+  padding: 13px 26px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: 0 10px 32px rgba(124, 58, 237, 0.42), 0 3px 10px rgba(15, 23, 42, 0.16);
+  border: 1px solid var(--text-heading);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.exploreBtn:hover {
+  background-color: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(124, 58, 237, 0.52), 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+.exploreBtn:active {
+  transform: translateY(0);
+}
+
+/* Handwritten Note from Figma */
+.handwrittenContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  color: #4F46E5;
+  transform: rotate(-3deg);
+  transform-origin: left center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.handwrittenText {
+  font-family: var(--font-script);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.05;
+  display: flex;
+  flex-direction: column;
+  letter-spacing: -0.01em;
+}
+
+.handwrittenArrow {
+  width: 44px;
+  height: 28px;
+  color: #4F46E5;
+  flex-shrink: 0;
+  transform: translateY(-4px);
+}
+
+@media (max-width: 1300px) {
+  .heading {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    max-width: 100%;
+    align-items: flex-start;
+  }
+  .heading {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  .heading {
+    font-size: 36px;
+  }
+}
