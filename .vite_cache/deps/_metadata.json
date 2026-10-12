@@ -1,0 +1,84 @@
+{
+  "hash": "03cc7d6e",
+  "configHash": "8e579575",
+  "lockfileHash": "102667a8",
+  "browserHash": "4432befd",
+  "optimized": {
+    "@react-three/drei": {
+      "src": "../../node_modules/@react-three/drei/index.js",
+      "file": "@react-three_drei.js",
+      "fileHash": "eef5117a",
+      "needsInterop": false
+    },
+    "@react-three/fiber": {
+      "src": "../../node_modules/@react-three/fiber/dist/react-three-fiber.esm.js",
+      "file": "@react-three_fiber.js",
+      "fileHash": "e367960c",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.mjs",
+      "file": "lucide-react.js",
+      "fileHash": "228f56b1",
+      "needsInterop": false
+    },
+    "react-dom": {
+      "src": "../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "d6114324",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "935dd745",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "9bed9c44",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "1014f41d",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "ae220de3",
+      "needsInterop": true
+    },
+    "three": {
+      "src": "../../node_modules/three/build/three.module.js",
+      "file": "three.js",
+      "fileHash": "fb8e56f8",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "react-three-fiber.esm-BHusv7n_": {
+      "file": "react-three-fiber.esm-BHusv7n_.js",
+      "isDynamicEntry": false
+    },
+    "rolldown-runtime-DC62tzP2": {
+      "file": "rolldown-runtime-DC62tzP2.js",
+      "isDynamicEntry": false
+    },
+    "scheduler-kNtYHXIZ": {
+      "file": "scheduler-kNtYHXIZ.js",
+      "isDynamicEntry": false
+    },
+    "three.module-CwO0auyC": {
+      "file": "three.module-CwO0auyC.js",
+      "isDynamicEntry": false
+    },
+    "vision_bundle-Dztt9rWn": {
+      "file": "vision_bundle-Dztt9rWn.js",
+      "isDynamicEntry": true
+    }
+  }
+}
