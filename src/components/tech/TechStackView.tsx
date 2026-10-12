@@ -1,218 +1,329 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, X, ChevronLeft, ChevronRight, CheckCircle2, Cpu, Zap, ShieldCheck } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Tech3DCanvas } from './Tech3DCanvas';
 import styles from './TechStackView.module.css';
 
 interface TechStackViewProps {
   onBack: () => void;
-  onOpenProjects: () => void;
+  onOpenProjects?: () => void;
 }
 
-interface TechData {
+export interface TechStackItem {
   id: string;
+  number: string;
   name: string;
-  iconLabel: string;
   color: string;
   title: string;
   subtitle: string;
-  description: string;
   metrics: {
-    label: string;
     value: string;
+    label: string;
   }[];
-  pillars: string[];
-  skills: {
-    category: string;
+  highlight: string;
+  capabilities: string[];
+  toolGroups: {
+    title: string;
     items: string[];
+  }[];
+  nodes3D: {
+    label: string;
+    color: string;
+    position: [number, number, number];
   }[];
 }
 
-const TECH_LIST: TechData[] = [
+// Tech-specific SVG icons matching Figma
+export const TechIcon: React.FC<{ id: string; color?: string; size?: number }> = ({
+  id,
+  color = '#38BDF8',
+  size = 20,
+}) => {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    'aria-hidden': true,
+  } as const;
+
+  switch (id) {
+    case 'react':
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="2.2" fill={color} />
+          <ellipse cx="12" cy="12" rx="9.5" ry="3.6" stroke={color} strokeWidth="1.6" />
+          <ellipse
+            cx="12"
+            cy="12"
+            rx="9.5"
+            ry="3.6"
+            stroke={color}
+            strokeWidth="1.6"
+            transform="rotate(60 12 12)"
+          />
+          <ellipse
+            cx="12"
+            cy="12"
+            rx="9.5"
+            ry="3.6"
+            stroke={color}
+            strokeWidth="1.6"
+            transform="rotate(120 12 12)"
+          />
+        </svg>
+      );
+
+    case 'typescript':
+      return (
+        <svg {...common}>
+          <rect x="2.5" y="2.5" width="19" height="19" rx="4" stroke={color} strokeWidth="1.8" />
+          <path
+            d="M6.5 9h5M9 9v7.5M14 9.5c.8-.6 2.2-.8 3.2 0 .8.6.8 1.8 0 2.4-1 .7-2.6.9-2.6 2.2 0 .7.6 1.4 1.8 1.4 1 0 2-.4 2.6-.9"
+            stroke={color}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'micro-frontends':
+      return (
+        <svg {...common}>
+          <rect x="3" y="3" width="7.5" height="7.5" rx="2" stroke={color} strokeWidth="1.8" />
+          <rect x="13.5" y="3" width="7.5" height="7.5" rx="2" stroke={color} strokeWidth="1.8" />
+          <rect x="3" y="13.5" width="7.5" height="7.5" rx="2" stroke={color} strokeWidth="1.8" />
+          <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" stroke={color} strokeWidth="1.8" />
+        </svg>
+      );
+
+    case 'nodejs':
+      return (
+        <svg {...common}>
+          <path
+            d="M12 2.5L20.5 7.5V16.5L12 21.5L3.5 16.5V7.5L12 2.5Z"
+            stroke={color}
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 7.5V16.5M12 12L16.5 9.5M12 12L7.5 14.5"
+            stroke={color}
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case 'python':
+      return (
+        <svg {...common}>
+          {/* Top Snake */}
+          <path
+            d="M11.5 2.5c-3.2 0-3.8 1.4-3.8 2.8v2.2h5.5v.8H5.8c-1.8 0-3.3 1.2-3.3 3.3 0 2.1 1.2 3.4 3.3 3.4h1.5v-2.2c0-1.8 1.5-3.3 3.3-3.3h5.2c1.4 0 2.4-1 2.4-2.4V5.3c0-1.6-1.5-2.8-6.7-2.8z"
+            fill={color}
+            opacity="0.9"
+          />
+          <circle cx="9.5" cy="5" r="0.9" fill="#060A12" />
+          {/* Bottom Snake */}
+          <path
+            d="M12.5 21.5c3.2 0 3.8-1.4 3.8-2.8v-2.2h-5.5v-.8h7.4c1.8 0 3.3-1.2 3.3-3.3 0-2.1-1.2-3.4-3.3-3.4h-1.5v2.2c0 1.8-1.5 3.3-3.3 3.3H8.2c-1.4 0-2.4 1-2.4 2.4v3.6c0 1.6 1.5 2.8 6.7 2.8z"
+            fill={color}
+          />
+          <circle cx="14.5" cy="19" r="0.9" fill="#060A12" />
+        </svg>
+      );
+
+    default:
+      return null;
+  }
+};
+
+export const TECH_LIST: TechStackItem[] = [
   {
     id: 'react',
+    number: '01',
     name: 'React',
-    iconLabel: '⚛',
-    color: '#00B4D8',
+    color: '#38BDF8',
     title: 'React Ecosystem',
-    subtitle: 'High-performance UI architecture, concurrent rendering & reactive state engines.',
-    description:
-      'Engineered large-scale enterprise portals with React 18/19, leveraging component composition, custom hook abstractions, and optimized virtual DOM reconciliation for sub-second user flows.',
+    subtitle: 'Concurrent UI, reactive state, shipped at enterprise scale.',
     metrics: [
-      { label: 'Enterprise Delivery', value: '2+ Years' },
-      { label: 'Render Loops', value: '60 FPS' },
-      { label: 'Core Components', value: '80+ UI Lib' },
+      { value: '2.4 yrs', label: 'ENTERPRISE' },
+      { value: '60 FPS', label: 'RENDER LOOPS' },
+      { value: '80+', label: 'CORE COMPONENTS' },
     ],
-    pillars: [
-      'Component Composition & Clean Architecture',
-      'Concurrent Mode & Suspense Boundaries',
-      'Optimized Virtual DOM Reconciliation',
-      'Event-Driven Reactive State Workflows',
+    highlight: 'In production for Abu Dhabi DoE and TAQA Water Solutions',
+    capabilities: [
+      'Component composition and shared libraries',
+      'Concurrent mode and Suspense boundaries',
+      'Micro-frontends via Module Federation',
+      'Bilingual RTL and RBAC-driven UI',
     ],
-    skills: [
+    toolGroups: [
       {
-        category: 'Core & Architecture',
-        items: ['React 18 / 19', 'Hooks Architecture', 'Context Engine', 'Server-Sent Events'],
+        title: 'State and data',
+        items: ['Redux Toolkit', 'RTK Query', 'Redux-Saga', 'TanStack Query'],
       },
       {
-        category: 'State & Data Fetching',
-        items: ['Redux Toolkit', 'RTK Query', 'Redux-Saga', 'React Query / TanStack'],
+        title: 'UI and forms',
+        items: ['MUI', 'Ant Design', 'Framer Motion', 'React Hook Form', 'Zod'],
       },
-      {
-        category: 'UI & Systems',
-        items: ['MUI / Material UI', 'Ant Design', 'Framer Motion', 'Tailwind / Vanilla CSS'],
-      },
-      {
-        category: 'Forms & Validation',
-        items: ['React Hook Form', 'Yup Validation', 'Zod Schemas', 'Controlled Flows'],
-      },
+    ],
+    nodes3D: [
+      { label: 'Redux Toolkit', color: '#38BDF8', position: [-0.46, 0.22, 0.1] },
+      { label: 'React 18 / 19', color: '#38BDF8', position: [-0.38, -0.36, 0.1] },
+      { label: 'Module Federation', color: '#C084FC', position: [0.44, 0.36, 0.1] },
+      { label: 'RTK Query', color: '#38BDF8', position: [0.40, -0.30, 0.1] },
     ],
   },
   {
     id: 'typescript',
+    number: '02',
     name: 'TypeScript',
-    iconLabel: 'TS',
     color: '#3B82F6',
     title: 'TypeScript Architecture',
     subtitle: 'End-to-end type safety, strict domain modeling & compile-time correctness.',
-    description:
-      'Architected mission-critical enterprise systems using strict TypeScript patterns. Zero use of loose types, enforcing complete domain type safety, discriminated unions, and automated schema inference.',
     metrics: [
-      { label: 'Type Strictness', value: '100% Strict' },
-      { label: 'Runtime Safety', value: 'Zod + Yup' },
-      { label: 'Toolchain', value: 'TS 5.x Ready' },
+      { value: '100%', label: 'STRICT MODE' },
+      { value: '0 any', label: 'TYPE DISCIPLINE' },
+      { value: 'TS 5.x', label: 'COMPILER READY' },
     ],
-    pillars: [
-      'Strict Domain Modeling & Discriminated Unions',
-      'Advanced Generic Types & Utility Combinators',
-      'Runtime Schema Validation with Type Inference',
-      'AST-Driven Linters & Zero-Any Enforcement',
+    highlight: 'Zero runtime regressions across 12+ mission-critical releases',
+    capabilities: [
+      'Discriminated unions and exhaustive type checks',
+      'Generic utilities and conditional mapped types',
+      'Runtime schema validation with Zod and Yup',
+      'AST transformation and automated type contracts',
     ],
-    skills: [
+    toolGroups: [
       {
-        category: 'Type System',
+        title: 'Type System',
         items: ['Generics & Constraints', 'Conditional Types', 'Mapped Types', 'Template Literals'],
       },
       {
-        category: 'Validation & Schemas',
-        items: ['Zod Schema Inference', 'Yup Contracts', 'Type Guards', 'Branded Types'],
+        title: 'Validation & Tooling',
+        items: ['Zod Schemas', 'Yup Contracts', 'TS ESLint Strict', 'Typecheck Pipelines'],
       },
-      {
-        category: 'Tooling & Build',
-        items: ['TypeScript 5.x', 'tsc Compiler', 'TS ESLint Strict', 'Typecheck Pipelines'],
-      },
+    ],
+    nodes3D: [
+      { label: 'Strict Domain', color: '#38BDF8', position: [-0.44, 0.22, 0.05] },
+      { label: 'Zod Schemas', color: '#3B82F6', position: [-0.38, -0.36, 0.08] },
+      { label: 'Generics & Utility', color: '#60A5FA', position: [0.44, 0.36, 0.05] },
+      { label: 'TS 5.x Toolchain', color: '#38BDF8', position: [0.40, -0.30, 0.08] },
     ],
   },
   {
     id: 'micro-frontends',
+    number: '03',
     name: 'Micro-Frontends',
-    iconLabel: '◈',
     color: '#F97316',
     title: 'Micro-Frontend Systems',
-    subtitle: 'Decoupled domain applications orchestrated via Module Federation & host shell architecture.',
-    description:
-      'Engineered scalable micro-frontend architectures with Vite Plugin Federation and Webpack 5. Implemented shared design libraries, centralized authentication contexts, and privilege-based GateKeeper RBAC.',
+    subtitle: 'Decoupled domain applications orchestrated via Module Federation & host shell.',
     metrics: [
-      { label: 'Topology', value: 'Host + Federated' },
-      { label: 'Rollback Risk', value: 'Zero Systemwide' },
-      { label: 'Deployment', value: 'Autonomous S3' },
+      { value: '4 Apps', label: 'FEDERATED SUITE' },
+      { value: '0 Sec', label: 'SYSTEM DOWNTIME' },
+      { value: 'Autonomous', label: 'DEPLOYMENTS' },
     ],
-    pillars: [
-      'Vite & Webpack Module Federation Architecture',
-      'Central Host Shell (taqa-shell-ui) Orchestration',
-      'GateKeeper Role-Based Access Control (RBAC)',
-      'Shared Design System Library (80+ Components)',
+    highlight: 'Powering Abu Dhabi DoE unified licensing portal & multi-tenant shell',
+    capabilities: [
+      'Vite & Webpack 5 Module Federation architecture',
+      'Central host shell with shared auth tokens',
+      'GateKeeper RBAC & cross-application routing',
+      'Shared component runtime with zero bundle duplication',
     ],
-    skills: [
+    toolGroups: [
       {
-        category: 'Federation Engines',
-        items: ['Vite Plugin Federation', 'Webpack 5 MF', 'Dynamic Remotes', 'Shared Dependencies'],
+        title: 'Federation Engines',
+        items: ['Vite Federation', 'Webpack 5 MF', 'Dynamic Remotes', 'Shared Scope'],
       },
       {
-        category: 'Core Host Services',
-        items: ['Shared Auth Tokens', 'Theme Broadcasting', 'Cross-App Routing', 'Shared Loaders'],
+        title: 'Host Services',
+        items: ['Central Auth', 'Theme Engine', 'Route Hub', 'S3 CDN'],
       },
-      {
-        category: 'Governance & CI/CD',
-        items: ['Independent Deployments', 'Version Locking', 'AWS S3 Hosting', 'Jenkins Pipelines'],
-      },
+    ],
+    nodes3D: [
+      { label: 'Host Shell', color: '#C084FC', position: [-0.44, 0.22, 0.05] },
+      { label: 'Dynamic Remotes', color: '#38BDF8', position: [-0.38, -0.36, 0.08] },
+      { label: 'Module Federation', color: '#F97316', position: [0.44, 0.36, 0.05] },
+      { label: 'GateKeeper RBAC', color: '#10B981', position: [0.40, -0.30, 0.08] },
     ],
   },
   {
     id: 'nodejs',
+    number: '04',
     name: 'Node.js',
-    iconLabel: '⬡',
     color: '#22C55E',
     title: 'Node.js & Backend Services',
     subtitle: 'High-concurrency microservices, SSE real-time streaming & persistent data layers.',
-    description:
-      'Developed low-latency backend microservices and API gateways handling authentication, document validation queues, and real-time Server-Sent Events (SSE) data streams.',
     metrics: [
-      { label: 'Concurrency', value: 'Async Event Loop' },
-      { label: 'Real-Time', value: 'SSE Streaming' },
-      { label: 'Data Stores', value: 'MongoDB + Redis' },
+      { value: 'Async', label: 'EVENT LOOP' },
+      { value: '<50ms', label: 'API LATENCY' },
+      { value: 'Real-Time', label: 'SSE STREAMS' },
     ],
-    pillars: [
-      'Asynchronous Event-Driven Non-blocking I/O',
-      'Server-Sent Events (SSE) Real-Time Data Channels',
-      'JWT Authentication & Privilege Middleware',
-      'Scalable MongoDB Aggregations & Indexing',
+    highlight: 'High-throughput telemetry ingestion & PDF certificate signing pipeline',
+    capabilities: [
+      'Non-blocking asynchronous I/O and stream processing',
+      'Server-Sent Events (SSE) live telemetry channels',
+      'JWT authentication & enterprise RBAC middleware',
+      'MongoDB aggregation pipelines and Redis caching',
     ],
-    skills: [
+    toolGroups: [
       {
-        category: 'Runtime & Frameworks',
-        items: ['Node.js 20+ LTS', 'Express.js', 'REST API Design', 'SSE Channels'],
+        title: 'Runtime & APIs',
+        items: ['Node.js 20+ LTS', 'Express.js', 'REST APIs', 'SSE Channels'],
       },
       {
-        category: 'Databases & Auth',
-        items: ['MongoDB / Mongoose', 'JWT Authentication', 'RBAC Middleware', 'Bcrypt Security'],
+        title: 'Data & Security',
+        items: ['MongoDB', 'Redis', 'JWT Auth', 'Docker Containers'],
       },
-      {
-        category: 'DevOps & Tooling',
-        items: ['Docker Containers', 'NPM Workspaces', 'Postman Testing', 'Axios Interceptors'],
-      },
+    ],
+    nodes3D: [
+      { label: 'Event Loop', color: '#22C55E', position: [-0.44, 0.22, 0.05] },
+      { label: 'SSE Streams', color: '#4ADE80', position: [-0.38, -0.36, 0.08] },
+      { label: 'Express & REST', color: '#38BDF8', position: [0.44, 0.36, 0.05] },
+      { label: 'MongoDB & Redis', color: '#16A34A', position: [0.40, -0.30, 0.08] },
     ],
   },
   {
     id: 'python',
+    number: '05',
     name: 'Python',
-    iconLabel: '🐍',
     color: '#FBBF24',
     title: 'Python & FastAPI Stack',
     subtitle: 'High-throughput async APIs, document validation pipelines & LLM workflow integration.',
-    description:
-      'Engineered asynchronous Python pipelines for document validation, LLM-backed confidence scoring on regulatory certificates, and high-performance automated data processing.',
     metrics: [
-      { label: 'API Framework', value: 'FastAPI Async' },
-      { label: 'Validation', value: 'Pydantic v2' },
-      { label: 'AI Integration', value: 'LLM Document OCR' },
+      { value: '3.12', label: 'ASYNC PYTHON' },
+      { value: '100%', label: 'PYDANTIC V2' },
+      { value: 'LLM OCR', label: 'AI WORKFLOWS' },
     ],
-    pillars: [
-      'High-Speed Async API Design with FastAPI',
-      'Type-Safe Data Serialization via Pydantic v2',
-      'AI / LLM Document Verification Scoring',
-      'Asynchronous Event Processing with AsyncIO',
+    highlight: 'Automated compliance verification engine for regulatory utility filings',
+    capabilities: [
+      'High-speed async API design with FastAPI and Starlette',
+      'Type-safe data serialization via Pydantic v2',
+      'LLM certificate validation & OCR confidence scoring',
+      'AsyncIO background worker queues and batch processing',
     ],
-    skills: [
+    toolGroups: [
       {
-        category: 'Core Frameworks',
-        items: ['Python 3.12', 'FastAPI', 'Starlette', 'Uvicorn Server'],
+        title: 'Frameworks & Data',
+        items: ['FastAPI', 'Starlette', 'Pydantic v2', 'NumPy'],
       },
       {
-        category: 'Data & Schemas',
-        items: ['Pydantic v2', 'NumPy', 'JSON Schema', 'PDF Processing'],
+        title: 'AI & Automation',
+        items: ['LangChain Tools', 'LLM Document OCR', 'AsyncIO Tasks', 'PyTest'],
       },
-      {
-        category: 'AI & Automation',
-        items: ['LLM Document Scoring', 'LangChain Tools', 'PyTest Test Suites', 'AsyncIO Tasks'],
-      },
+    ],
+    nodes3D: [
+      { label: 'FastAPI Async', color: '#FBBF24', position: [-0.44, 0.22, 0.05] },
+      { label: 'AsyncIO Engine', color: '#38BDF8', position: [-0.38, -0.36, 0.08] },
+      { label: 'LLM Pipelines', color: '#F59E0B', position: [0.44, 0.36, 0.05] },
+      { label: 'Pydantic v2', color: '#60A5FA', position: [0.40, -0.30, 0.08] },
     ],
   },
 ];
 
-export const TechStackView: React.FC<TechStackViewProps> = ({
-  onBack,
-  onOpenProjects,
-}) => {
+export const TechStackView: React.FC<TechStackViewProps> = ({ onBack }) => {
   const [activeTechIndex, setActiveTechIndex] = useState(0);
 
   const activeTech = TECH_LIST[activeTechIndex] || TECH_LIST[0];
@@ -225,7 +336,7 @@ export const TechStackView: React.FC<TechStackViewProps> = ({
     setActiveTechIndex((prev) => (prev + 1) % TECH_LIST.length);
   }, []);
 
-  // Keyboard navigation
+  // Keyboard navigation matching hint bar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
@@ -248,32 +359,20 @@ export const TechStackView: React.FC<TechStackViewProps> = ({
       {/* Top Header Bar matching Figma */}
       <header className={styles.topHeader}>
         <div className={styles.brandGroup}>
-          <div className={styles.brandTitle}>
-            <svg
-              className={styles.sparkleIcon}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#38BDF8"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            >
-              <line x1="12" y1="2" x2="12" y2="22" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-              <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
-            </svg>
-            <span className={styles.brandName}>RAHUL.exe</span>
-          </div>
-
-          <button
-            type="button"
-            className={styles.backButton}
-            onClick={onBack}
-            aria-label="Back to universe"
+          <svg
+            className={styles.sparkleIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#38BDF8"
+            strokeWidth="2.4"
+            strokeLinecap="round"
           >
-            <ArrowLeft size={15} />
-            <span>Back to universe</span>
-          </button>
+            <line x1="12" y1="2" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+          </svg>
+          <span className={styles.brandName}>RAHUL.exe</span>
         </div>
 
         <button
@@ -286,10 +385,27 @@ export const TechStackView: React.FC<TechStackViewProps> = ({
         </button>
       </header>
 
-      {/* Main Layout: Left Vertical Rail + Center 3D Object + Right Technical Mastery Console */}
+      {/* Main Layout: Left Constellations + Center 3D + Right Console */}
       <div className={styles.mainLayout}>
         {/* Left Vertical Navigation Rail matching Figma */}
-        <nav className={styles.leftRail} aria-label="Tech Stack Navigation">
+        <nav className={styles.leftRail} aria-label="Constellations">
+          <div className={styles.constellationsHeader}>
+            <svg
+              className={styles.constellationIcon}
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <circle cx="3" cy="8" r="1.5" />
+              <circle cx="13" cy="4" r="1.5" />
+              <circle cx="10" cy="13" r="1.5" />
+              <line x1="4.5" y1="7.5" x2="11.5" y2="4.5" strokeOpacity="0.5" />
+              <line x1="3.5" y1="9.5" x2="8.8" y2="12.2" strokeOpacity="0.5" />
+            </svg>
+            <span className={styles.constellationsTitle}>CONSTELLATIONS</span>
+          </div>
+
           {TECH_LIST.map((tech, idx) => {
             const isActive = idx === activeTechIndex;
             return (
@@ -300,186 +416,109 @@ export const TechStackView: React.FC<TechStackViewProps> = ({
                 onClick={() => setActiveTechIndex(idx)}
                 aria-pressed={isActive}
               >
-                <span
-                  className={styles.railIconBadge}
-                  style={
-                    isActive
-                      ? {
-                          borderColor: tech.color,
-                          backgroundColor: `${tech.color}25`,
-                          boxShadow: `0 0 14px ${tech.color}70`,
-                        }
-                      : undefined
-                  }
-                >
-                  {tech.id === 'react' ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="2.5" fill="#38BDF8" />
-                      <ellipse cx="12" cy="12" rx="10" ry="4" stroke="#38BDF8" strokeWidth="1.6" />
-                      <ellipse
-                        cx="12"
-                        cy="12"
-                        rx="10"
-                        ry="4"
-                        stroke="#38BDF8"
-                        strokeWidth="1.6"
-                        transform="rotate(60 12 12)"
-                      />
-                      <ellipse
-                        cx="12"
-                        cy="12"
-                        rx="10"
-                        ry="4"
-                        stroke="#38BDF8"
-                        strokeWidth="1.6"
-                        transform="rotate(120 12 12)"
-                      />
-                    </svg>
-                  ) : (
-                    <span className={styles.iconGlyph}>{tech.iconLabel}</span>
-                  )}
-                </span>
-                <span className={styles.railLabel}>{tech.name}</span>
+                <div className={styles.railItemLeft}>
+                  <div className={styles.railIconBox}>
+                    <TechIcon id={tech.id} color={isActive ? '#38BDF8' : '#94A3B8'} size={18} />
+                  </div>
+                  <span className={styles.railName}>{tech.name}</span>
+                </div>
+                <span className={styles.railIndex}>{tech.number}</span>
               </button>
             );
           })}
-
-          {/* Projects Entry Point */}
-          <button
-            type="button"
-            className={`${styles.railItem} ${styles.railItemProjects}`}
-            onClick={onOpenProjects}
-            aria-label="Navigate to Projects"
-          >
-            <span className={styles.railIconBadgeProjects}>
-              {'</>'}
-            </span>
-            <span className={styles.railLabel}>Projects</span>
-          </button>
         </nav>
 
-        {/* Center: Interactive 3D Animated Canvas */}
+        {/* Center: Interactive 3D Animated Canvas + Pedestal + Hints */}
         <div className={styles.centerStage}>
-          <Tech3DCanvas activeTechId={activeTech.id} />
+          <div className={styles.canvasWrapper}>
+            <Tech3DCanvas activeTech={activeTech} onSelectTechIndex={setActiveTechIndex} />
+          </div>
+
+          {/* Bottom hint controls matching Figma */}
+          <div className={styles.bottomHintBar}>
+            <span className={styles.hintItem}>
+              <span className={styles.hintKey}>DRAG</span>
+              <span className={styles.hintDot}>·</span>
+              <span className={styles.hintAction}>orbit</span>
+            </span>
+            <span className={styles.hintItem}>
+              <span className={styles.hintKey}>SCROLL</span>
+              <span className={styles.hintDot}>·</span>
+              <span className={styles.hintAction}>zoom</span>
+            </span>
+            <span className={styles.hintItem}>
+              <span className={styles.hintKey}>CLICK NODE</span>
+              <span className={styles.hintDot}>·</span>
+              <span className={styles.hintAction}>inspect</span>
+            </span>
+            <span className={styles.hintItem}>
+              <span className={styles.hintKey}>← →</span>
+              <span className={styles.hintDot}>·</span>
+              <span className={styles.hintAction}>switch</span>
+            </span>
+          </div>
         </div>
 
-        {/* Right: Technical Mastery Console (Pure Tech & Architecture - No Project Details) */}
+        {/* Right: Technical Mastery Console matching Figma */}
         <aside className={styles.rightCard}>
-          {/* Card Header with Tech Icon & Title */}
+          {/* Card Header with Squarish Icon + Titles */}
           <div className={styles.cardHeader}>
-            <div
-              className={styles.headerIconBox}
-              style={{
-                borderColor: `${activeTech.color}60`,
-                backgroundColor: `${activeTech.color}18`,
-              }}
-            >
-              {activeTech.id === 'react' ? (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="3" fill="#38BDF8" />
-                  <ellipse cx="12" cy="12" rx="11" ry="4.5" stroke="#38BDF8" strokeWidth="1.8" />
-                  <ellipse
-                    cx="12"
-                    cy="12"
-                    rx="11"
-                    ry="4.5"
-                    stroke="#38BDF8"
-                    strokeWidth="1.8"
-                    transform="rotate(60 12 12)"
-                  />
-                  <ellipse
-                    cx="12"
-                    cy="12"
-                    rx="11"
-                    ry="4.5"
-                    stroke="#38BDF8"
-                    strokeWidth="1.8"
-                    transform="rotate(120 12 12)"
-                  />
-                </svg>
-              ) : activeTech.id === 'typescript' ? (
-                <ShieldCheck size={28} color="#3B82F6" />
-              ) : activeTech.id === 'micro-frontends' ? (
-                <Cpu size={28} color="#F97316" />
-              ) : (
-                <Zap size={28} color={activeTech.color} />
-              )}
+            <div className={styles.headerIconBox}>
+              <TechIcon id={activeTech.id} color="#38BDF8" size={26} />
             </div>
-            <div>
+            <div className={styles.headerTextGroup}>
               <h2 className={styles.techTitle}>{activeTech.title}</h2>
               <p className={styles.techSubtitle}>{activeTech.subtitle}</p>
             </div>
           </div>
 
-          {/* Metric Stats Chips */}
+          {/* Metrics Grid: 3 columns */}
           <div className={styles.metricsGrid}>
-            {activeTech.metrics.map((m, mIdx) => (
-              <div key={mIdx} className={styles.metricCard}>
+            {activeTech.metrics.map((m) => (
+              <div key={m.label} className={styles.metricCard}>
                 <span className={styles.metricValue}>{m.value}</span>
                 <span className={styles.metricLabel}>{m.label}</span>
               </div>
             ))}
           </div>
 
-          {/* Section: Architectural Pillars */}
+          {/* Highlight Callout Box matching Figma */}
+          <div className={styles.highlightBox}>
+            <span className={styles.highlightDot} />
+            <span className={styles.highlightText}>{activeTech.highlight}</span>
+          </div>
+
+          {/* Architectural Capabilities Section with 01 02 03 04 indices */}
           <div className={styles.cardSection}>
-            <h3 className={styles.sectionTitle}>Architectural Capabilities</h3>
-            <ul className={styles.pillarList}>
-              {activeTech.pillars.map((pillar, pIdx) => (
-                <li key={pIdx} className={styles.pillarItem}>
-                  <CheckCircle2
-                    size={16}
-                    color={activeTech.color}
-                    className={styles.pillarCheckIcon}
-                  />
-                  <span className={styles.pillarText}>{pillar}</span>
+            <h3 className={styles.sectionTitle}>ARCHITECTURAL CAPABILITIES</h3>
+            <ul className={styles.capabilitiesList}>
+              {activeTech.capabilities.map((cap, idx) => (
+                <li key={cap} className={styles.capabilityItem}>
+                  <span className={styles.capabilityIndex}>
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <span className={styles.capabilityText}>{cap}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Section: Categorized Skills & Libraries */}
+          {/* Tools Section with Groups and Pill Badges */}
           <div className={styles.cardSection}>
-            <h3 className={styles.sectionTitle}>Specialized Libraries & Tools</h3>
-            <div className={styles.categoriesGroup}>
-              {activeTech.skills.map((cat, cIdx) => (
-                <div key={cIdx} className={styles.categorySubgroup}>
-                  <span className={styles.categoryHeading}>{cat.category}</span>
-                  <div className={styles.skillsPillGroup}>
-                    {cat.items.map((skill) => (
-                      <span key={skill} className={styles.skillPill}>
-                        {skill}
+            <h3 className={styles.sectionTitle}>TOOLS</h3>
+            <div className={styles.toolsGroup}>
+              {activeTech.toolGroups.map((group) => (
+                <div key={group.title} className={styles.toolSubgroup}>
+                  <span className={styles.toolSubgroupHeading}>{group.title}</span>
+                  <div className={styles.pillsRow}>
+                    {group.items.map((tool) => (
+                      <span key={tool} className={styles.toolPill}>
+                        {tool}
                       </span>
                     ))}
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Bottom Pagination Control */}
-          <div className={styles.cardFooter}>
-            <span className={styles.navHint}>Use arrows or keys to explore stack</span>
-            <div className={styles.paginationPill}>
-              <button
-                type="button"
-                className={styles.pArrowBtn}
-                onClick={handlePrev}
-                aria-label="Previous tech stack"
-              >
-                <ChevronLeft size={15} />
-              </button>
-              <span className={styles.pageNumber}>
-                {String(activeTechIndex + 1).padStart(2, '0')} / {String(TECH_LIST.length).padStart(2, '0')}
-              </span>
-              <button
-                type="button"
-                className={styles.pArrowBtn}
-                onClick={handleNext}
-                aria-label="Next tech stack"
-              >
-                <ChevronRight size={15} />
-              </button>
             </div>
           </div>
         </aside>

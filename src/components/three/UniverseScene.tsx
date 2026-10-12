@@ -776,7 +776,6 @@ const TechModuleNode: React.FC<{
       <Html
         position={labelOffset}
         center
-        distanceFactor={11}
         zIndexRange={[100, 0]}
         style={{ pointerEvents: 'auto' }}
       >
@@ -792,18 +791,18 @@ const TechModuleNode: React.FC<{
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px',
-            padding: '5px 13px',
+            gap: '5.5px',
+            padding: '3.5px 10px',
             backgroundColor: '#FFFFFF',
             border: isSelected
               ? `1.5px solid ${module.color}`
-              : '1px solid rgba(226, 218, 206, 0.8)',
+              : '1px solid rgba(226, 218, 206, 0.85)',
             borderRadius: '9999px',
             boxShadow: isSelected
-              ? `0 0 0 3px ${module.color}25, 0 8px 20px rgba(15, 23, 42, 0.12)`
+              ? `0 0 0 2px ${module.color}28, 0 4px 14px rgba(15, 23, 42, 0.12)`
               : isHovered
-              ? '0 6px 18px rgba(15, 23, 42, 0.12)'
-              : '0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04)',
+              ? '0 4px 12px rgba(15, 23, 42, 0.10)'
+              : '0 2px 6px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03)',
             fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
             fontSize: '11px',
             fontWeight: 600,
@@ -811,14 +810,15 @@ const TechModuleNode: React.FC<{
             cursor: 'pointer',
             userSelect: 'none',
             whiteSpace: 'nowrap',
+            lineHeight: 1.2,
             transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-            transform: isHovered || isSelected ? 'scale(1.05)' : 'scale(1)',
+            transform: isHovered || isSelected ? 'scale(1.04)' : 'scale(1)',
           }}
         >
           <span
             style={{
-              width: '5.5px',
-              height: '5.5px',
+              width: '5px',
+              height: '5px',
               borderRadius: '50%',
               backgroundColor: module.color,
               boxShadow: `0 0 4px ${module.color}`,
